@@ -3,9 +3,14 @@ from django.views.generic.detail import DetailView
 from .models import Book, Library
 
 # Function-based view
+from django.http import HttpResponse
+from .models import Book
+
 def list_books(request):
-    books = Book.objects.select_related('author').all()
-    return render(request, 'list_books.html', {'books': books})
+    books = Book.objects.all()
+    book_list = "\n".join([f"{book.title} by {book.author.name}" for book in books])
+    return HttpResponse(book_list, content_type="text/plain")
+
 
 # Class-based view
 class LibraryDetailView(DetailView):
