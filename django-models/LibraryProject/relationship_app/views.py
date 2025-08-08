@@ -1,6 +1,9 @@
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.views.generic.detail import DetailView
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
 from .models import Library, Book
+
 
 # Function-based view
 def list_books(request):
@@ -13,9 +16,7 @@ class LibraryDetailView(DetailView):
     template_name = "relationship_app/library_detail.html" 
     context_object_name = 'library'
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth import login, logout, authenticate
+
 
 def login_view(request):
     if request.method == 'POST':
