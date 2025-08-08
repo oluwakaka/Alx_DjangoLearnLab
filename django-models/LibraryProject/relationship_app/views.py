@@ -1,9 +1,8 @@
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.views.generic.detail import DetailView
 from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from .models import Library, Book
-
+from django.views.generic.detail import DetailView
 
 # Function-based view
 def list_books(request):
