@@ -13,25 +13,36 @@ class LibraryDetailView(DetailView):
     template_name = "relationship_app/library_detail.html" 
     context_object_name = 'library'
 
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
-from django.views import View
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import login, logout, authenticate
 
-class CustomLoginView(LoginView):
-    template_name = 'relationship_app/login.html'
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data.get('username'),
+                password=form.cleaned_data.get('password')
+            )
+            if user is not None:
+                login(request, user)
+                return redirect('/')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'relationship_app/login.html', {'form': form})
 
-class CustomLogoutView(LogoutView):
-    template_name = 'relationship_app/logout.html'
+def logout_view(request):
+    logout(request)
+    return render(request, 'relationship_app/logout.html')
 
-class RegisterView(View):
-    def get(self, request):
-        form = UserCreationForm()
-        return render(request, 'relationship_app/register.html', {'form': form})
-
-    def post(self, request):
+def register_view(request):
+    if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
-        return render(request, 'relationship_app/register.html', {'form': form})
+            user = form.save()
+            login(request, user)
+            return redirect('/')
+    else:
+        form = UserCreationForm()
+    return render(request, 'relationship_app/register.html', {'form': form})
