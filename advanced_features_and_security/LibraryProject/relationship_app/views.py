@@ -7,7 +7,7 @@ from .models import Library, Book
 from django.views.generic.detail import DetailView
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-form .forms import BookForm
+from .forms import BookForm
 
 @permission_required('relationship_app.can_add_book')
 def add_book(request):

@@ -7,4 +7,3 @@ This project demonstrates complex relationships in Django using:
 - OneToOneField
 
 
-Custom User Model with extra fields: date_of_birth, profile_photo
