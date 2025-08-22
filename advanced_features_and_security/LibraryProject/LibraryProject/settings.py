@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'bookshelf',
      #'relationship_app.apps.RelationshipAppConfig', 
     'rest_framework',
-    'accounts',
+    #'accounts',
 ]
 
 MIDDLEWARE = [
@@ -105,7 +105,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Use custom user model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "bookshelf.CustomUser"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
