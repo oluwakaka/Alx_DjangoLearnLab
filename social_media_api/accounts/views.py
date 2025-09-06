@@ -1,12 +1,8 @@
-from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions, status
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import LoginSerializer, UserRegistrationSerializer, UserSerializer
-
-User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
@@ -17,13 +13,12 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        token, _ = Token.objects.get_or_create(user=user)
+        # serializer already attached token
         data = {
             "user": UserSerializer(user, context={"request": request}).data,
-            "token": token.key,
+            "token": serializer.data.get("token"),
         }
-        headers = self.get_success_headers(serializer.data)
-        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class LoginView(APIView):
@@ -33,10 +28,10 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        token, _ = Token.objects.get_or_create(user=user)
+        token = serializer.validated_data["token"]
         return Response({
-            "token": token.key,
-            "user": UserSerializer(user, context={"request": request}).data
+            "user": UserSerializer(user, context={"request": request}).data,
+            "token": token,
         })
 
 
