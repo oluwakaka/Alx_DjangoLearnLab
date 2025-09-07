@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -18,7 +17,6 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        # serializer already attached token
         data = {
             "user": UserSerializer(user, context={"request": request}).data,
             "token": serializer.data.get("token"),
@@ -60,48 +58,4 @@ class ProfileView(APIView):
 
 
 # -------------------------
-# Follow / Unfollow Endpoints
-# -------------------------
-
-@api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
-def follow_user(request, user_id):
-    target = get_object_or_404(User, pk=user_id)
-    if target == request.user:
-        return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-
-    if request.user.following.filter(pk=target.pk).exists():
-        return Response({"detail": f"Already following {target.username}."}, status=status.HTTP_200_OK)
-
-    request.user.following.add(target)
-    return Response({"detail": f"You are now following {target.username}."}, status=status.HTTP_200_OK)
-
-
-@api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
-def unfollow_user(request, user_id):
-    target = get_object_or_404(User, pk=user_id)
-    if target == request.user:
-        return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-
-    if not request.user.following.filter(pk=target.pk).exists():
-        return Response({"detail": f"You are not following {target.username}."}, status=status.HTTP_200_OK)
-
-    request.user.following.remove(target)
-    return Response({"detail": f"You have unfollowed {target.username}."}, status=status.HTTP_200_OK)
-
-
-class FollowingListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        return self.request.user.following.all()
-
-
-class FollowersListView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        return self.request.user.followers.all()
+# Follow / Unfollow End
