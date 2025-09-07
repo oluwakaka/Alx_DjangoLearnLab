@@ -7,9 +7,13 @@ from .permissions import IsOwnerOrReadOnly
 
 class PostViewSet(viewsets.ModelViewSet):
     """
-    /api/posts/ - list, create
-    /api/posts/{id}/ - retrieve, update, destroy
-    Searchable by title and content using ?search=keyword
+    Endpoints:
+    - /api/posts/         -> list, create
+    - /api/posts/{id}/    -> retrieve, update, destroy
+
+    Supports:
+    - Search by title/content (?search=keyword)
+    - Ordering by created_at or updated_at (?ordering=created_at)
     """
     queryset = Post.objects.all().select_related("author").prefetch_related("comments")
     serializer_class = PostSerializer
@@ -24,9 +28,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
-    /api/comments/ - list, create
-    /api/comments/{id}/ - retrieve, update, destroy
-    You can filter comments by post id using ?post=<post_id>
+    Endpoints:
+    - /api/comments/         -> list, create
+    - /api/comments/{id}/    -> retrieve, update, destroy
+
+    Supports:
+    - Filter comments by post (?post=<post_id>)
     """
     queryset = Comment.objects.all().select_related("author", "post")
     serializer_class = CommentSerializer
@@ -45,12 +52,19 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class FeedView(generics.ListAPIView):
     """
-    /api/feed/ - list posts from users the current user follows
-    Ordered by creation date (newest first)
+    Endpoint:
+    - /api/feed/ -> list posts from users the current user follows
+    Ordered by creation date (newest first).
     """
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        following_ids = user.fol_
+        following_ids = user.following.values_list("id", flat=True)
+        return (
+            Post.objects.filter(author__id__in=following_ids)
+            .select_related("author")
+            .prefetch_related("comments")
+            .order_by("-created_at")
+        )
