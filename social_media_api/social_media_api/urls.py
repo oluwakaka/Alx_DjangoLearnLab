@@ -7,6 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("accounts.urls")),   # existing
     path("api/", include("posts.urls")),           # <-- new
+    path("api/notifications/", include("notifications.urls")), 
 ]
 
 if settings.DEBUG:

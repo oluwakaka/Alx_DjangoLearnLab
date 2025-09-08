@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from accounts.serializers import UserSerializer  # lightweight user representation
 
 
@@ -31,3 +31,12 @@ class PostSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "author", "comments", "comments_count", "created_at", "updated_at"]
+
+        class LikeSerializer(serializers.ModelSerializer):
+            user = UserSerializer(read_only=True)
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+
+    class Meta:
+        model = Like
+        fields = ["id", "post", "user", "created_at"]
+        read_only_fields = ["id", "user", "created_at"]

@@ -4,10 +4,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User as CustomUser
-from .serializers import LoginSerializer, UserRegistrationSerializer, UserSerializer
+from .serializers import (
+    LoginSerializer,
+    UserRegistrationSerializer,
+    UserSerializer,
+)
 
+
+# -------------------------
+# Registration & Login
+# -------------------------
 
 class RegisterView(generics.CreateAPIView):
+    """Register a new user"""
     permission_classes = [permissions.AllowAny]
     serializer_class = UserRegistrationSerializer
 
@@ -23,6 +32,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LoginView(APIView):
+    """Login an existing user"""
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
@@ -36,7 +46,12 @@ class LoginView(APIView):
         })
 
 
+# -------------------------
+# Profile Management
+# -------------------------
+
 class ProfileView(APIView):
+    """View or update the authenticated user's profile"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -56,10 +71,11 @@ class ProfileView(APIView):
 
 
 # -------------------------
-# Follow / Unfollow Endpoints
+# Follow / Unfollow System
 # -------------------------
 
 class FollowUserView(generics.GenericAPIView):
+    """Follow another user"""
     queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
@@ -74,6 +90,7 @@ class FollowUserView(generics.GenericAPIView):
 
 
 class UnfollowUserView(generics.GenericAPIView):
+    """Unfollow another user"""
     queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
@@ -88,6 +105,7 @@ class UnfollowUserView(generics.GenericAPIView):
 
 
 class FollowingListView(generics.ListAPIView):
+    """List of users the authenticated user is following"""
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
@@ -96,6 +114,7 @@ class FollowingListView(generics.ListAPIView):
 
 
 class FollowersListView(generics.ListAPIView):
+    """List of users who follow the authenticated user"""
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
